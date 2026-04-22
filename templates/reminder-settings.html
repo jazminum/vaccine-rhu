@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dosage Scheduling - Boac RHU</title>
+    <link rel="stylesheet" href="/static/shared.css">
+    <style>
+        .dosage-row { display: grid; grid-template-columns: 1.5fr 1.5fr 1fr auto; gap: 15px; align-items: end; background: #f9f9f9; padding: 15px; border-radius: 8px; margin-bottom: 12px; border: 1px solid #ddd; }
+        .btn-add { background: #27ae60; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; margin-bottom: 20px; font-weight: bold; }
+        .btn-remove { background: #e74c3c; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <img src="/image/logo.png" class="sidebar-logo">
+            <h2>RHU BOAC<br>ARVRS</h2>
+        </div>
+        <ul class="nav-links">
+            <li><a href="registration.html">Registration</a></li>
+            <li><a href="reminder-settings.html" class="active">Reminder Settings</a></li>
+            <li><a href="monitoring-checklist.html">Monitoring</a></li>
+            <li><a href="records.html">Records</a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <p style="margin-bottom: 10px; opacity: 0.8;">Municipality of Boac © 2026</p>
+            <button class="logout-btn" onclick="handleLogout()">Logout</button>
+        </div>
+    </div>
+
+    <main class="main-content">
+        <div class="card">
+            <h2 class="page-title">Dosage Scheduling</h2>
+            <p style="margin-bottom: 20px; font-size: 0.9rem; color: #555;">Set the labels and dates for the patient's treatment plan.</p>
+            
+            <div id="dosageList"></div>
+
+            <button type="button" class="btn-add" id="addDoseBtn">+ Add Next Dosage Appointment</button>
+            <div style="margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px;">
+                <button id="saveBtn" class="btn-primary">Save</button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const list = document.getElementById('dosageList');
+        const temp = JSON.parse(sessionStorage.getItem('temp_patient'));
+        let doseCounter = 1;
+
+        window.onload = () => {
+            if(!temp) {
+                alert("No patient data found. Redirecting to registration.");
+                window.location.href = 'registration.html';
+                return;
+            }
+            addDoseRow("Dose 1 (Initial)", temp.firstDoseDate, temp.firstDoseTime, true);
+        };
+
+        function addDoseRow(label = "", date = "", time = "", isLocked = false) {
+            if(!isLocked) doseCounter++;
+            const div = document.createElement('div');
+            div.className = 'dosage-row';
+            if(isLocked) div.style.background = "#eef9f2";
+
+            div.innerHTML = `
+                <div class="form-group">
+                    <label>Label</label>
+                    <input type="text" class="d-label" value="${label || 'Dose ' + doseCounter}" ${isLocked ? 'readonly' : ''}>
+                </div>
+                <div class="form-group">
+                    <label>Date</label>
+                    <input type="date" class="d-date" value="${date}" ${isLocked ? 'readonly' : ''} required>
+                </div>
+                <div class="form-group">
+                    <label>Time</label>
+                    <input type="time" class="d-time" value="${time || temp.firstDoseTime}" ${isLocked ? 'readonly' : ''} required>
+                </div>
+                ${isLocked ? '<span></span>' : '<button type="button" class="btn-remove" onclick="this.parentElement.remove()">✕</button>'}
+            `;
+            list.appendChild(div);
+        }
+
+        document.getElementById('addDoseBtn').onclick = () => addDoseRow();
+
+        document.getElementById('saveBtn').onclick = async () => {
+            const rows = document.querySelectorAll('.dosage-row');
+            const fullSchedule = Array.from(rows).map(row => ({
+                label: row.querySelector('.d-label').value,
+                date: row.querySelector('.d-date').value,
+                time: row.querySelector('.d-time').value,
+                status: 'Pending' 
+            }));
+
+            const finalData = { ...temp, fullSchedule };
+            
+            try {
+                const response = await fetch('/api/register_patient', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(finalData)
+                });
+                const result = await response.json();
+                if (result.success) {
+                    alert("Patient Registered Successfully.");
+                    sessionStorage.removeItem('temp_patient');
+                    window.location.href = 'monitoring-checklist.html';
+                } else {
+                    alert("Error: " + result.message);
+                }
+            } catch (error) {
+                console.error("Error registering patient:", error);
+                alert("An error occurred during registration.");
+            }
+        };
+
+        // Logout Logic
+        function handleLogout() {
+            if(confirm("Are you sure you want to logout?")) {
+                sessionStorage.clear();
+                window.location.href = '/logout';
+            }
+        }
+    </script>
+</body>
+</html>

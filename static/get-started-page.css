@@ -1,0 +1,91 @@
+/* --- Global Resets --- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background-color: #ffffff;
+    height: 100vh;
+}
+
+.page-wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+/* --- Hero/Center Section --- */
+.hero {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.header-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 20px;
+}
+
+/* Container for Title and Button */
+.title-button-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.logo {
+    height: 200px;
+}
+
+.main-title {
+    color: #000000;
+    font-size: 2.5rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+
+/* --- Button: Aligned to Lower Right of Title --- */
+.btn {
+    align-self: flex-end; /* This moves the button to the right side of the column */
+    background-color: rgba(220, 245, 205, 0.9); /* Translucent light green tint from photo */
+    color: #000000; /* Black text */
+    border: 1px solid #c0c0c0; /* Light gray border */
+    padding: 10px 45px; /* Elongated, rounded shape */
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn:hover {
+    background-color: #f0f0f0; /* Subtle hover effect */
+    border-color: #999999;
+}
+
+/* --- Footer --- */
+.footer {
+    color: #000000;
+    padding: 25px 0;
+    text-align: center;
+    font-size: 0.95rem;
+}
+
+/* --- Responsive for Mobile --- */
+@media (max-width: 900px) {
+    .header-container {
+        flex-direction: column;
+        text-align: center;
+    }
+    .btn {
+        align-self: center; /* Center button on mobile for better layout */
+    }
+    .main-title {
+        font-size: 1.8rem;
+    }
+}

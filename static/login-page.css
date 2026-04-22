@@ -1,0 +1,127 @@
+/* --- Basic Reset --- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif; /* Clean font from the photo */
+}
+
+/* --- Background and Main Wrapper --- */
+.background-wrapper {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* You must provide your own background image in the images folder */
+    background: url('images/background.jpg') no-repeat center center fixed; 
+    background-size: cover;
+}
+
+/* --- The Login Card --- */
+.login-card {
+    background-color: rgba(220, 245, 205, 0.9); /* Translucent light green tint from photo */
+    padding: 40px;
+    border-radius: 20px; /* Rounded corners */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Soft depth shadow */
+    width: 380px; /* Fixed width matching the aesthetic */
+    text-align: left;
+}
+
+/* --- Header Section (Logo/Title) --- */
+.card-header {
+    display: flex;
+    justify-content: space-between; /* Logo left, title right */
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.rhu-logo {
+    height: 60px; /* Adjust based on your logo aspect ratio */
+    width: auto;
+}
+
+.header-text {
+    text-align: right;
+    color: #000000;
+}
+
+.header-text h1 {
+    font-size: 1.1rem;
+    font-weight: bold;
+}
+
+.header-text h2 {
+    font-size: 0.8rem;
+    font-weight: normal;
+    opacity: 0.9;
+}
+
+/* --- Form and Inputs --- */
+.input-group {
+    margin-bottom: 18px;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 1.1rem;
+    color: #000000;
+}
+
+input[type="text"],
+input[type="password"] {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #c0c0c0; /* Subtle border */
+    border-radius: 4px;
+    font-size: 1.1rem;
+}
+
+/* --- Password Wrapper for the Icon --- */
+.password-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+#togglePassword {
+    position: absolute;
+    right: 15px; /* Icon placement from photo */
+    cursor: pointer;
+    color: #c0c0c0; /* Gray color for the eye icon */
+    font-size: 1.2rem;
+}
+
+/* --- Keep Me Logged In Section --- */
+.remember-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 30px;
+}
+
+.remember-group label {
+    font-size: 1rem;
+    color: #333;
+}
+
+/* --- The Login Button --- */
+.submit-group {
+    text-align: center;
+}
+
+.btn-login {
+    background-color: #ffffff; /* White background */
+    color: #000000; /* Black text */
+    border: 1px solid #c0c0c0; /* Light gray border */
+    padding: 10px 45px; /* Elongated, rounded shape */
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-login:hover {
+    background-color: #f0f0f0; /* Subtle hover effect */
+    border-color: #999999;
+}

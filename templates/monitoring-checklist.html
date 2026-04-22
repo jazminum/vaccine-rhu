@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Monitoring - Boac RHU</title>
+    <link rel="stylesheet" href="/static/shared.css">
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <img src="/image/logo.png" class="sidebar-logo">
+            <h2>RHU BOAC<br>ARVRS</h2>
+        </div>
+        <ul class="nav-links">
+            <li><a href="registration.html">Registration</a></li>
+            <li><a href="reminder-settings.html">Reminder Settings</a></li>
+            <li><a href="monitoring-checklist.html" class="active">Monitoring</a></li>
+            <li><a href="records.html">Records</a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <p style="margin-bottom: 10px; opacity: 0.8;">Municipality of Boac © 2026</p>
+            <button class="logout-btn" onclick="handleLogout()">Logout</button>
+        </div>
+    </div>
+
+    <main class="main-content">
+        <div class="card">
+            <h2 class="page-title">Attendance Verification</h2>
+            <div id="activeList"></div>
+        </div>
+    </main>
+
+    <script>
+        async function renderMonitoring() {
+            const container = document.getElementById('activeList');
+            try {
+                const response = await fetch('/api/patients');
+                const allPatients = await response.json();
+                const active = allPatients.filter(p => !p.completed);
+                
+                if(active.length === 0) {
+                    container.innerHTML = "<p>No patients currently in treatment.</p>";
+                    return;
+                }
+
+                container.innerHTML = active.map(p => `
+                    <div class="patient-card">
+                        <h3>${p.name}</h3>
+                        <p style="font-size:0.9rem; color:#666;">📞 ${p.phone} | 📍 ${p.address}</p>
+                        
+                        <div class="dose-grid">
+                            ${p.fullSchedule.map((s) => {
+                                let statusClass = 'status-pending';
+                                if(s.status === 'Done') statusClass = 'status-completed';
+                                if(s.status === 'Missed') statusClass = 'status-missed';
+
+                                return `
+                                    <div class="dose-item ${statusClass}">
+                                        <div><strong>${s.label}</strong><br>📅 ${s.date}</div>
+                                        <select class="status-select" onchange="updateDoseStatus(${s.id}, this.value)">
+                                            <option value="Pending" ${s.status === 'Pending' ? 'selected' : ''}>⏳ Pending</option>
+                                            <option value="Done" ${s.status === 'Done' ? 'selected' : ''}>✅ Done</option>
+                                            <option value="Missed" ${s.status === 'Missed' ? 'selected' : ''}>❌ Missed</option>
+                                        </select>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+
+                        <button onclick="finishTreatment(${p.id})" class="btn-primary" style="background:#27ae60; margin-top:10px;">
+                           Completed
+                        </button>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error("Error fetching patients:", error);
+                container.innerHTML = "<p>Error loading patient data.</p>";
+            }
+        }
+
+        window.updateDoseStatus = async (doseId, newStatus) => {
+            try {
+                const response = await fetch('/api/update_dose_status', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ doseId, status: newStatus })
+                });
+                const result = await response.json();
+                if (result.success) {
+                    renderMonitoring(); 
+                } else {
+                    alert("Error updating status: " + result.message);
+                }
+            } catch (error) {
+                console.error("Error updating status:", error);
+            }
+        };
+
+        window.finishTreatment = async (patientId) => {
+            if(!confirm("Move this patient to Records?")) return;
+            try {
+                const response = await fetch('/api/complete_treatment', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ patientId })
+                });
+                const result = await response.json();
+                if (result.success) {
+                    renderMonitoring();
+                } else {
+                    alert("Error completing treatment: " + result.message);
+                }
+            } catch (error) {
+                console.error("Error completing treatment:", error);
+            }
+        };
+
+        // Logout Logic
+        function handleLogout() {
+            if(confirm("Are you sure you want to logout?")) {
+                sessionStorage.clear();
+                window.location.href = '/logout';
+            }
+        }
+
+        renderMonitoring();
+    </script>
+</body>
+</html>
